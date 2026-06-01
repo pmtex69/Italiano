@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Italiano Expresso - 3 Semanas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        italy: {
+                            green: '#008C45',
+                            white: '#F4F5F0',
+                            red: '#CD212A',
+                            dark: '#1e293b'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .active-tab { border-bottom: 3px solid #008C45; font-weight: bold; color: #008C45; }
+        .recording-pulse { animation: pulse-slow 1.5s infinite; }
+        @keyframes pulse-slow {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 1; }
+        }
+        /* Ocultar barra de scroll para design mais limpo */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
+
+    <!-- Header com as cores da bandeira de Itália -->
+    <header class="bg-white shadow-sm py-4 px-6 sticky top-0 z-50 border-t-4 border-t-italy-red">
+        <div class="max-w-4xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="bg-italy-green p-2 rounded-lg">
+                    <i data-lucide="plane-takeoff" class="w-6 h-6 text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight text-italy-dark">Italiano para Viagem</h1>
+                    <p class="text-xs text-slate-500">Plano Intensivo: 3 Semanas (15 min/dia)</p>
+                </div>
+            </div>
+            
+            <div class="w-full md:w-64 bg-slate-200 rounded-full h-4 relative overflow-hidden">
+                <div id="progressBar" class="bg-italy-green h-full transition-all duration-700" style="width: 0%;"></div>
+                <span id="progressText" class="absolute inset-0 flex justify-center items-center text-[10px] font-bold text-slate-700 mix-blend-color-burn">Progresso: 0%</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Menu -->
+    <nav class="bg-white border-b border-slate-200">
+        <div class="max-w-4xl mx-auto flex overflow-x-auto whitespace-nowrap">
+            <button onclick="switchTab('tab-plano')" id="btn-tab-plano" class="py-3 px-6 text-sm flex items-center gap-2 border-b-3 border-transparent text-slate-600 hover:text-italy-green active-tab transition">
+                <i data-lucide="calendar" class="w-4 h-4"></i> Roteiro de 21 Dias
+            </button>
+            <button onclick="switchTab('tab-estudo')" id="btn-tab-estudo" class="py-3 px-6 text-sm flex items-center gap-2 border-b-3 border-transparent text-slate-600 hover:text-italy-green transition">
+                <i data-lucide="book-open" class="w-4 h-4"></i> Sala de Estudo
+            </button>
+            <button onclick="switchTab('tab-pronuncia')" id="btn-tab-pronuncia" class="py-3 px-6 text-sm flex items-center gap-2 border-b-3 border-transparent text-slate-600 hover:text-italy-green transition">
+                <i data-lucide="mic" class="w-4 h-4"></i> Laboratório de Pronúncia
+            </button>
+        </div>
+    </nav>
+
+    <!-- Conteúdo Principal -->
+    <main class="flex-grow max-w-4xl w-full mx-auto p-4 md:p-6 pb-20">
+        
+        <!-- SEÇÃO: ROTEIRO DE 21 DIAS -->
+        <section id="tab-plano" class="tab-content space-y-6">
+            <div class="bg-italy-dark rounded-2xl p-6 text-white shadow-md relative overflow-hidden">
+                <div class="absolute right-0 top-0 opacity-10 transform translate-x-1/4 -translate-y-1/4">
+                    <i data-lucide="map" class="w-48 h-48"></i>
+                </div>
+                <h2 class="text-2xl font-bold mb-2">Benvenuto! (Bem-vindo)</h2>
+                <p class="text-slate-300 text-sm md:text-base max-w-2xl">O segredo não é estudar horas a fio, mas sim 15 minutos todos os dias. Selecione o dia atual, memorize as frases e treine a pronúncia em voz alta.</p>
+            </div>
+
+            <!-- Lista de Semanas gerada por JS -->
+            <div id="weeksContainer" class="space-y-8">
+                <!-- Conteúdo Injetado via JS -->
+            </div>
+        </section>
+
+        <!-- SEÇÃO: SALA DE ESTUDO -->
+        <section id="tab-estudo" class="tab-content hidden space-y-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-2xl font-bold text-italy-dark">Lição do Dia</h2>
+                    <p class="text-slate-500 text-sm" id="lessonDayTitle">Selecione um dia no roteiro para começar.</p>
+                </div>
+                <button onclick="switchTab('tab-plano')" class="text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 py-2 px-4 rounded-lg font-medium transition">
+                    Voltar ao Roteiro
+                </button>
+            </div>
+
+            <!-- Flashcards -->
+            <div id="flashcardsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-white p-8 rounded-xl border border-slate-200 text-center shadow-sm text-slate-400">
+                    <i data-lucide="mouse-pointer-click" class="w-8 h-8 mx-auto mb-2 opacity-50"></i>
+                    <p>Por favor, selecione um dia no separador "Roteiro de 21 Dias".</p>
+                </div>
+            </div>
+            
+            <div id="markDoneContainer" class="hidden text-center pt-4">
+                <button id="btnMarkDone" class="bg-italy-green hover:bg-green-700 text-white font-bold py-3 px-8 rounded-xl shadow-lg transition flex items-center justify-center gap-2 mx-auto">
+                    <i data-lucide="check-circle" class="w-5 h-5"></i> Marcar Dia como Concluído
+                </button>
+            </div>
+        </section>
+
+        <!-- SEÇÃO: LABORATÓRIO DE PRONÚNCIA -->
+        <section id="tab-pronuncia" class="tab-content hidden space-y-6">
+            <div class="flex flex-col gap-2">
+                <h2 class="text-2xl font-bold text-italy-dark">Teste a sua Pronúncia</h2>
+                <p class="text-slate-500 text-sm">Os italianos apreciam muito quando tenta falar a língua deles. Escreva uma frase, ouça o áudio nativo e grave-se para comparar.</p>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Entrada de Texto -->
+                    <div class="space-y-4">
+                        <label class="block text-sm font-bold text-slate-700">Frase em Italiano a Praticar:</label>
+                        <textarea id="customItalianText" rows="3" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-3 text-lg focus:outline-none focus:border-italy-green focus:ring-1 focus:ring-italy-green transition" placeholder="Ex: Vorrei un caffè, per favore.">Vorrei un caffè, per favore.</textarea>
+                        
+                        <div class="flex gap-2">
+                            <button onclick="speakItalian(document.getElementById('customItalianText').value)" class="flex-1 bg-blue-50 text-blue-700 border border-blue-200 py-2 rounded-lg font-bold text-sm hover:bg-blue-100 transition flex items-center justify-center gap-2">
+                                <i data-lucide="volume-2" class="w-4 h-4"></i> Ouvir Nativo
+                            </button>
+                            <button onclick="speakItalianSlow(document.getElementById('customItalianText').value)" class="flex-1 bg-slate-50 text-slate-700 border border-slate-200 py-2 rounded-lg font-bold text-sm hover:bg-slate-100 transition flex items-center justify-center gap-2">
+                                <i data-lucide="turtle" class="w-4 h-4"></i> Ouvir Lento
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Gravador -->
+                    <div class="bg-slate-50 rounded-xl p-5 border border-slate-200 flex flex-col justify-center items-center text-center">
+                        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">A Sua Vez</span>
+                        
+                        <button id="recordBtn" onclick="toggleRecording()" class="bg-italy-red hover:bg-red-700 w-16 h-16 rounded-full text-white transition flex items-center justify-center shadow-lg mb-4">
+                            <i data-lucide="mic" id="recordIcon" class="w-6 h-6"></i>
+                        </button>
+                        
+                        <p id="recordStatus" class="text-sm font-bold text-slate-700">Toque para gravar</p>
+                        
+                        <div id="audioPlaybackContainer" class="mt-4 w-full hidden">
+                            <audio id="audioPlayback" controls class="w-full h-8"></audio>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        lucide.createIcons();
+
+        // BASE DE DADOS DO CURSO (3 Semanas / 21 Dias)
+        const courseData = [
+            // SEMANA 1: Sobrevivência e Educação
+            { day: 1, week: 1, title: "Saudações Básicas", phrases: [
+                { it: "Buongiorno", pt: "Bom dia" },
+                { it: "Buonasera", pt: "Boa tarde / Boa noite (chegada)" },
+                { it: "Ciao", pt: "Olá / Adeus (informal)" },
+                { it: "Arrivederci", pt: "Adeus (formal)" }
+            ]},
+            { day: 2, week: 1, title: "As Palavras Mágicas", phrases: [
+                { it: "Per favore", pt: "Por favor" },
+                { it: "Grazie", pt: "Obrigado/a" },
+                { it: "Prego", pt: "De nada" },
+                { it: "Scusa", pt: "Desculpa / Com licença" }
+            ]},
+            { day: 3, week: 1, title: "Comunicação Básica", phrases: [
+                { it: "Sì / No", pt: "Sim / Não" },
+                { it: "Non capisco", pt: "Não percebo" },
+                { it: "Parla inglese?", pt: "Fala inglês?" },
+                { it: "Parlo un po' di italiano", pt: "Falo um pouco de italiano" }
+            ]},
+            { day: 4, week: 1, title: "Apresentar-se", phrases: [
+                { it: "Mi chiamo...", pt: "Chamo-me..." },
+                { it: "Piacere", pt: "Prazer em conhecer" },
+                { it: "Sono portoghese", pt: "Sou português/portuguesa" },
+                { it: "Come sta?", pt: "Como está? (formal)" }
+            ]},
+            { day: 5, week: 1, title: "Números (1 a 5)", phrases: [
+                { it: "Uno, Due, Tre", pt: "Um, Dois, Três" },
+                { it: "Quattro, Cinque", pt: "Quatro, Cinco" },
+                { it: "Un tavolo per due", pt: "Uma mesa para dois" },
+                { it: "Tre biglietti", pt: "Três bilhetes" }
+            ]},
+            { day: 6, week: 1, title: "Perguntas Úteis", phrases: [
+                { it: "Dov'è il bagno?", pt: "Onde é a casa de banho?" },
+                { it: "Quanto costa?", pt: "Quanto custa?" },
+                { it: "Cosa consiglia?", pt: "O que recomenda?" }
+            ]},
+            { day: 7, week: 1, title: "Revisão da Semana 1", phrases: [
+                { it: "Buongiorno, un tavolo per due, per favore.", pt: "Bom dia, uma mesa para dois, por favor." },
+                { it: "Scusa, dov'è il bagno?", pt: "Com licença, onde é a casa de banho?" }
+            ]},
+
+            // SEMANA 2: Comer e Beber (Crucial para Itália!)
+            { day: 8, week: 2, title: "No Restaurante (Chegada)", phrases: [
+                { it: "Avete un tavolo?", pt: "Têm uma mesa?" },
+                { it: "Il menu, per favore", pt: "A ementa, por favor" },
+                { it: "Siamo pronti per ordinare", pt: "Estamos prontos para pedir" }
+            ]},
+            { day: 9, week: 2, title: "Bebidas", phrases: [
+                { it: "Acqua naturale / frizzante", pt: "Água sem gás / com gás" },
+                { it: "Un bicchiere di vino rosso", pt: "Um copo de vinho tinto" },
+                { it: "Una birra, per favore", pt: "Uma cerveja, por favor" },
+                { it: "Un caffè macchiato", pt: "Um café pingado" }
+            ]},
+            { day: 10, week: 2, title: "Comida (Pratos)", phrases: [
+                { it: "Vorrei la pasta", pt: "Queria a massa" },
+                { it: "Un antipasto", pt: "Uma entrada" },
+                { it: "Carne o pesce?", pt: "Carne ou peixe?" },
+                { it: "Senza formaggio", pt: "Sem queijo" }
+            ]},
+            { day: 11, week: 2, title: "Alergias e Restrições", phrases: [
+                { it: "Sono vegetariano", pt: "Sou vegetariano/a" },
+                { it: "Sono allergico al glutine", pt: "Sou alérgico ao glúten" },
+                { it: "È piccante?", pt: "É picante?" }
+            ]},
+            { day: 12, week: 2, title: "Pagar a Conta", phrases: [
+                { it: "Il conto, per favore", pt: "A conta, por favor" },
+                { it: "Posso pagare con la carta?", pt: "Posso pagar com cartão?" },
+                { it: "Tenghi il resto", pt: "Fique com o troco" }
+            ]},
+            { day: 13, week: 2, title: "Elogiar a Comida", phrases: [
+                { it: "È buonissimo!", pt: "Está ótimo/muito bom!" },
+                { it: "Tutto delizioso", pt: "Tudo delicioso" },
+                { it: "Complimenti allo chef", pt: "Os meus parabéns ao chef" }
+            ]},
+            { day: 14, week: 2, title: "Revisão da Semana 2", phrases: [
+                { it: "Vorrei un bicchiere di vino e la pasta.", pt: "Queria um copo de vinho e a massa." },
+                { it: "Tutto delizioso. Il conto, per favore.", pt: "Tudo delicioso. A conta, por favor." }
+            ]},
+
+            // SEMANA 3: Direções, Compras e Transportes
+            { day: 15, week: 3, title: "Transportes", phrases: [
+                { it: "La stazione dei treni", pt: "A estação de comboios" },
+                { it: "Un biglietto per Roma", pt: "Um bilhete para Roma" },
+                { it: "A che ora parte?", pt: "A que horas parte?" }
+            ]},
+            { day: 16, week: 3, title: "Direções", phrases: [
+                { it: "Dritto", pt: "Em frente" },
+                { it: "A destra", pt: "À direita" },
+                { it: "A sinistra", pt: "À esquerda" },
+                { it: "È lontano?", pt: "É longe?" }
+            ]},
+            { day: 17, week: 3, title: "Tempo e Horários", phrases: [
+                { it: "Oggi / Domani", pt: "Hoje / Amanhã" },
+                { it: "Che ore sono?", pt: "Que horas são?" },
+                { it: "Quando chiude?", pt: "Quando fecha?" }
+            ]},
+            { day: 18, week: 3, title: "Compras Básicas", phrases: [
+                { it: "Sto solo guardando", pt: "Estou só a ver" },
+                { it: "Posso provare?", pt: "Posso experimentar?" },
+                { it: "Avete una taglia più grande?", pt: "Têm um tamanho maior?" }
+            ]},
+            { day: 19, week: 3, title: "Emergências", phrases: [
+                { it: "Aiuto!", pt: "Socorro!" },
+                { it: "Ho bisogno di un medico", pt: "Preciso de um médico" },
+                { it: "Ho perso il passaporto", pt: "Perdi o meu passaporte" }
+            ]},
+            { day: 20, week: 3, title: "O Essencial do Gelato!", phrases: [
+                { it: "Un cono / Una coppetta", pt: "Um cone / Um copo" },
+                { it: "Due gusti: pistacchio e fragola", pt: "Dois sabores: pistácio e morango" },
+                { it: "Con panna, per favore", pt: "Com natas, por favor" }
+            ]},
+            { day: 21, week: 3, title: "Revisão Final para Viagem", phrases: [
+                { it: "Scusa, dov'è la stazione? È a destra?", pt: "Com licença, onde é a estação? É à direita?" },
+                { it: "Grazie mille per l'aiuto! Arrivederci.", pt: "Muito obrigado/a pela ajuda! Adeus." }
+            ]}
+        ];
+
+        let userProgress = JSON.parse(localStorage.getItem('italian_app_progress')) || [];
+        let currentDayStudy = null;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            renderPlan();
+            updateProgressBar();
+        });
+
+        // Alternar separadores (Tabs)
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
+            document.getElementById(tabId).classList.remove('hidden');
+
+            document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active-tab'));
+            document.getElementById(`btn-${tabId}`).classList.add('active-tab');
+        }
+
+        // Renderizar Roteiro
+        function renderPlan() {
+            const container = document.getElementById('weeksContainer');
+            container.innerHTML = '';
+
+            const weeks = [1, 2, 3];
+            const weekTitles = ["Semana 1: O Essencial para Sobreviver", "Semana 2: Comer, Beber e Aproveitar", "Semana 3: Explorar, Comprar e Viajar"];
+
+            weeks.forEach((w, index) => {
+                const weekDays = courseData.filter(d => d.week === w);
+                
+                const weekDiv = document.createElement('div');
+                weekDiv.innerHTML = `<h3 class="text-lg font-bold text-italy-green border-b-2 border-slate-200 pb-2 mb-4">${weekTitles[index]}</h3>`;
+                
+                const gridDiv = document.createElement('div');
+                gridDiv.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3';
+
+                weekDays.forEach(dayInfo => {
+                    const isDone = userProgress.includes(dayInfo.day);
+                    
+                    const card = document.createElement('div');
+                    card.className = `p-4 rounded-xl border cursor-pointer transition transform hover:-translate-y-1 ${isDone ? 'bg-slate-100 border-slate-200 opacity-70' : 'bg-white border-slate-200 shadow-sm hover:border-italy-green hover:shadow-md'}`;
+                    card.onclick = () => openStudyRoom(dayInfo.day);
+
+                    card.innerHTML = `
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-xs font-bold ${isDone ? 'text-slate-400' : 'text-italy-red'}">DIA ${dayInfo.day}</span>
+                            ${isDone ? '<i data-lucide="check-circle" class="w-4 h-4 text-italy-green"></i>' : ''}
+                        </div>
+                        <h4 class="font-bold text-sm text-slate-800 ${isDone ? 'line-through' : ''}">${dayInfo.title}</h4>
+                        <p class="text-[10px] text-slate-500 mt-2">${dayInfo.phrases.length} frases</p>
+                    `;
+                    gridDiv.appendChild(card);
+                });
+
+                weekDiv.appendChild(gridDiv);
+                container.appendChild(weekDiv);
+            });
+
+            lucide.createIcons();
+        }
+
+        // Abrir Sala de Estudo para um Dia
+        function openStudyRoom(dayNumber) {
+            currentDayStudy = courseData.find(d => d.day === dayNumber);
+            
+            document.getElementById('lessonDayTitle').innerText = `Dia ${currentDayStudy.day} — ${currentDayStudy.title}`;
+            
+            const flashContainer = document.getElementById('flashcardsContainer');
+            flashContainer.innerHTML = '';
+
+            currentDayStudy.phrases.forEach((phrase, idx) => {
+                const card = document.createElement('div');
+                card.className = "bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between";
+                card.innerHTML = `
+                    <div class="mb-4">
+                        <p class="text-xl font-bold text-italy-dark mb-1 select-all">${phrase.it}</p>
+                        <p class="text-sm text-slate-500 italic">${phrase.pt}</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="speakItalian('${phrase.it.replace(/'/g, "\\'")}')" class="flex-1 bg-blue-50 text-blue-700 py-2 rounded-lg text-xs font-bold hover:bg-blue-100 transition flex items-center justify-center gap-1">
+                            <i data-lucide="volume-2" class="w-3 h-3"></i> Ouvir
+                        </button>
+                        <button onclick="sendToPronunciationLab('${phrase.it.replace(/'/g, "\\'")}')" class="flex-1 bg-slate-50 text-slate-600 py-2 rounded-lg text-xs font-bold hover:bg-slate-200 transition border border-slate-200 flex items-center justify-center gap-1">
+                            <i data-lucide="mic" class="w-3 h-3"></i> Treinar
+                        </button>
+                    </div>
+                `;
+                flashContainer.appendChild(card);
+            });
+
+            // Botão de Concluir
+            const markDoneBtn = document.getElementById('btnMarkDone');
+            document.getElementById('markDoneContainer').classList.remove('hidden');
+            
+            if (userProgress.includes(dayNumber)) {
+                markDoneBtn.innerHTML = `<i data-lucide="rotate-ccw" class="w-5 h-5"></i> Desmarcar como Concluído`;
+                markDoneBtn.className = "bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-3 px-8 rounded-xl transition flex items-center justify-center gap-2 mx-auto";
+                markDoneBtn.onclick = () => toggleDayStatus(dayNumber, false);
+            } else {
+                markDoneBtn.innerHTML = `<i data-lucide="check-circle" class="w-5 h-5"></i> Marcar Dia como Concluído`;
+                markDoneBtn.className = "bg-italy-green hover:bg-green-700 text-white font-bold py-3 px-8 rounded-xl shadow-lg transition flex items-center justify-center gap-2 mx-auto";
+                markDoneBtn.onclick = () => toggleDayStatus(dayNumber, true);
+            }
+
+            lucide.createIcons();
+            switchTab('tab-estudo');
+        }
+
+        // Enviar frase para o gravador
+        function sendToPronunciationLab(text) {
+            document.getElementById('customItalianText').value = text;
+            switchTab('tab-pronuncia');
+        }
+
+        // Marcar/Desmarcar dia
+        function toggleDayStatus(dayNumber, isDone) {
+            if (isDone) {
+                if (!userProgress.includes(dayNumber)) userProgress.push(dayNumber);
+            } else {
+                userProgress = userProgress.filter(d => d !== dayNumber);
+            }
+            localStorage.setItem('italian_app_progress', JSON.stringify(userProgress));
+            updateProgressBar();
+            renderPlan();
+            openStudyRoom(dayNumber); // Refresh na vista atual
+        }
+
+        function updateProgressBar() {
+            const percent = Math.round((userProgress.length / 21) * 100);
+            document.getElementById('progressBar').style.width = `${percent}%`;
+            document.getElementById('progressText').innerText = `Progresso: ${percent}% (${userProgress.length}/21)`;
+        }
+
+        // ================= TTS (SÍNTESE DE VOZ ITALIANA) =================
+        function getItalianVoice() {
+            if (!('speechSynthesis' in window)) return null;
+            const voices = window.speechSynthesis.getVoices();
+            // Procurar preferencialmente it-IT (Italiano de Itália)
+            let voice = voices.find(v => v.lang === 'it-IT' || v.lang === 'it_IT');
+            if (!voice) voice = voices.find(v => v.lang.startsWith('it'));
+            return voice;
+        }
+
+        function speakItalian(text, slow = false) {
+            if (!('speechSynthesis' in window)) {
+                alert("O seu navegador não suporta áudio nativo.");
+                return;
+            }
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            const itVoice = getItalianVoice();
+            if (itVoice) {
+                utterance.voice = itVoice;
+            } else {
+                utterance.lang = 'it-IT'; // Fallback forçar idioma no navegador
+            }
+            
+            utterance.rate = slow ? 0.6 : 0.95; // Velocidade normal ou lenta
+            utterance.pitch = 1.0;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function speakItalianSlow(text) {
+            speakItalian(text, true);
+        }
+
+        // Garantir carregamento das vozes
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.onvoiceschanged = getItalianVoice;
+        }
+
+        // ================= GRAVADOR DE VOZ =================
+        let mediaRecorder;
+        let audioChunks = [];
+        let isRecording = false;
+
+        async function toggleRecording() {
+            const btn = document.getElementById('recordBtn');
+            const icon = document.getElementById('recordIcon');
+            const status = document.getElementById('recordStatus');
+            const playbackContainer = document.getElementById('audioPlaybackContainer');
+
+            if (!isRecording) {
+                // Iniciar Gravação
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    mediaRecorder = new MediaRecorder(stream);
+                    audioChunks = [];
+
+                    mediaRecorder.ondataavailable = event => {
+                        audioChunks.push(event.data);
+                    };
+
+                    mediaRecorder.onstop = () => {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
+                        const audioUrl = URL.createObjectURL(audioBlob);
+                        const player = document.getElementById('audioPlayback');
+                        player.src = audioUrl;
+                        playbackContainer.classList.remove('hidden');
+                        
+                        // Parar microfone
+                        stream.getTracks().forEach(track => track.stop());
+                    };
+
+                    mediaRecorder.start();
+                    isRecording = true;
+                    btn.classList.add('recording-pulse');
+                    status.innerText = "A gravar... Fale agora!";
+                    status.classList.add('text-italy-red');
+                    playbackContainer.classList.add('hidden');
+                } catch (err) {
+                    console.error(err);
+                    alert("Necessita de dar permissão ao microfone no navegador para treinar a pronúncia.");
+                }
+            } else {
+                // Parar Gravação
+                mediaRecorder.stop();
+                isRecording = false;
+                btn.classList.remove('recording-pulse');
+                status.innerText = "Gravação concluída. Ouça abaixo:";
+                status.classList.remove('text-italy-red');
+            }
+        }
+    </script>
+</body>
+</html>
